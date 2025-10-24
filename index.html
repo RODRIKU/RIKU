@@ -3,215 +3,258 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>المرجع التفاعلي لبروتوكول داء الكلب</title>
+    <title>محاكي بروتوكول داء الكلب التفاعلي</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap');
 
         :root {
-            --primary-color: #005a9c; --secondary-color: #f0f4f8; --accent-color: #007bff;
-            --success-color: #28a745; --warning-color: #ffc107; --danger-color: #dc3545;
-            --text-color: #333; --border-color: #dee2e6;
+            --primary-color: #004e92;
+            --secondary-color: #f8f9fa;
+            --accent-color: #e5383b;
+            --success-color: #38a700;
+            --danger-color: #dc3545;
+            --text-color: #212529;
+            --header-color: var(--primary-color);
+            --sidebar-width: 250px;
         }
 
         * { box-sizing: border-box; }
 
         body {
-            font-family: 'Cairo', sans-serif; background-color: var(--secondary-color);
-            color: var(--text-color); margin: 0; scroll-behavior: smooth;
-            overflow-x: hidden;
+            font-family: 'Cairo', sans-serif; 
+            background-color: var(--secondary-color);
+            background: linear-gradient(135deg, var(--secondary-color) 0%, #d4e0eb 100%);
+            color: var(--text-color); 
+            margin: 0; 
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
         }
 
         .container { 
-            display: none; /* إخفاء المحتوى الرئيسي افتراضياً */
+            display: flex; 
             width: 100%; 
             min-height: 100vh; 
+            max-width: 900px;
+            padding: 0;
+            margin: 0;
+            flex-direction: column; 
+            align-items: center;
         }
         
-        /* دمج وتعديل زر القائمة وزر الرجوع */
+        /* عناصر التحكم العلوية */
         .hamburger-menu, #back-button {
-            display: none; position: fixed; top: 15px; z-index: 1001;
-            background: #fff; border: 1px solid var(--border-color); border-radius: 8px;
-            width: 45px; height: 45px; font-size: 24px; cursor: pointer;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center;
+            position: fixed; 
+            top: 20px; 
+            z-index: 1001;
+            background: var(--primary-color);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            width: 40px; 
+            height: 40px; 
+            font-size: 1.2em; 
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            transition: background-color 0.2s;
         }
+        .hamburger-menu { right: 20px; } 
+        #back-button { left: 20px; } 
         
-        .hamburger-menu { right: 15px; } 
-        #back-button { left: 15px; font-size: 1.5em; padding-bottom: 5px; } 
+        .hamburger-menu:active, #back-button:active {
+            transform: scale(0.95);
+        }
+        .hamburger-menu:hover, #back-button:hover {
+            background-color: #0066a5;
+        }
 
-        html[dir="ltr"] .hamburger-menu { right: auto; left: 15px; }
-        html[dir="ltr"] #back-button { left: auto; right: 15px; } 
+        html[dir="ltr"] .hamburger-menu { right: auto; left: 20px; }
+        html[dir="ltr"] #back-button { left: auto; right: 20px; } 
 
+        /* الشريط الجانبي (قائمة الهامبرغر) */
         .sidebar {
-            width: 320px; background-color: #fff; padding: 20px;
-            border-left: 1px solid var(--border-color); box-shadow: -2px 0 10px rgba(0,0,0,0.05);
-            position: fixed; right: 0; top: 0; height: 100%; overflow-y: auto;
-            display: flex; flex-direction: column; transition: transform 0.3s ease-in-out;
+            width: var(--sidebar-width); 
+            background: var(--text-color); 
+            color: #fff;
+            padding: 20px;
+            position: fixed; 
+            right: 0; 
+            top: 0; 
+            height: 100%; 
+            transform: translateX(100%);
+            z-index: 1000;
+            transition: transform 0.3s ease-in-out;
+            box-shadow: -4px 0 10px rgba(0,0,0,0.4);
+            display: flex; 
+            flex-direction: column;
         }
-        
-        #search-box {
-            width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color);
-            margin-bottom: 15px; font-family: 'Cairo', sans-serif; font-size: 1em;
+        html[dir="ltr"] .sidebar { 
+             right: auto; left: 0; transform: translateX(-100%);
+             box-shadow: 4px 0 10px rgba(0,0,0,0.4);
         }
-        
-        #lang-toggle {
-            align-self: flex-start; background-color: var(--secondary-color); border: 1px solid var(--border-color);
-            padding: 8px 12px; border-radius: 8px; cursor: pointer; font-weight: 600; margin-bottom: 15px;
-        }
-        .sidebar h2 {
-            color: var(--primary-color); text-align: center; margin-top: 0; margin-bottom: 20px;
-            border-bottom: 2px solid var(--primary-color); padding-bottom: 10px;
-        }
+        .sidebar.open { transform: translateX(0); }
+        .sidebar h2 { color: var(--accent-color); border-bottom: 1px solid rgba(255, 255, 255, 0.2); padding-bottom: 10px; margin-bottom: 20px; }
         .sidebar ul { list-style: none; padding: 0; margin: 0; }
         .sidebar ul li a {
-            display: flex; align-items: center; gap: 10px; padding: 12px 15px; text-decoration: none; color: var(--text-color);
-            border-radius: 8px; margin-bottom: 5px; transition: all 0.2s ease-in-out; font-weight: 600;
-        }
-        .sidebar ul li a:hover { background-color: var(--secondary-color); color: var(--primary-color); }
-        .sidebar ul li a.active { background-color: var(--primary-color); color: #fff; }
-
-        .main-content { flex-grow: 1; padding: 40px; margin-right: 320px; }
-        html[dir="ltr"] .main-content { margin-right: 0; margin-left: 320px; }
-        html[dir="ltr"] .sidebar {
-            right: auto; left: 0; border-left: none; border-right: 1px solid var(--border-color);
-            box-shadow: 2px 0 10px rgba(0,0,0,0.05);
-        }
-        
-        .content-section { display: block; padding-top: 20px; margin-top: -20px; }
-        .card {
-            background-color: #fff; border-radius: 12px; padding: 30px; margin-bottom: 30px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08); border: 1px solid var(--border-color);
-        }
-        .card h3, .card h4 { color: var(--primary-color); margin-top: 0; margin-bottom: 20px; display: flex; align-items: center; }
-        html[dir="rtl"] .card h3::before, html[dir="rtl"] .card h4::before { content: '🔹'; margin-left: 10px; }
-        html[dir="ltr"] .card h3::after, html[dir="ltr"] .card h4::after { content: '🔹'; margin-right: 10px; }
-        
-        .card p, .card li { line-height: 1.8; font-size: 1.1em; }
-        
-        .golden-rules li { font-weight: 600; padding: 10px; margin-bottom: 10px; border-right: 4px solid; }
-        html[dir="ltr"] .golden-rules li { border-right: none; border-left: 4px solid; }
-        .rule-do { border-color: var(--success-color); background-color: #e2f0d9; }
-        .rule-dont { border-color: var(--danger-color); background-color: #f8d7da; }
-
-        .simulator { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
-        .simulator select { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); font-family: 'Cairo', sans-serif; font-size: 1em; }
-        #simulator-result { margin-top: 20px; padding: 20px; border-radius: 8px; background: var(--secondary-color); }
-        
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 1em; }
-        th, td { padding: 12px 15px; border: 1px solid var(--border-color); }
-        html[dir="rtl"] th, html[dir="rtl"] td { text-align: right; }
-        html[dir="ltr"] th, html[dir="ltr"] td { text-align: left; }
-        th { background-color: var(--secondary-color); font-weight: 700; }
-        
-        .accordion-item { border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 10px; overflow: hidden; }
-        .accordion-header { background-color: var(--secondary-color); padding: 15px; cursor: pointer; font-weight: 700; font-size: 1.1em; display: flex; justify-content: space-between; align-items: center; }
-        html[dir="rtl"] .accordion-header::after { content: '▼'; transition: transform 0.3s; }
-        html[dir="ltr"] .accordion-header::before { content: '▼'; transition: transform 0.3s; }
-        html[dir="rtl"] .accordion-header.active::after { transform: rotate(180deg); }
-        html[dir="ltr"] .accordion-header.active::before { transform: rotate(180deg); }
-        .accordion-content { max-height: 0; overflow: hidden; padding: 0 20px; transition: max-height 0.3s ease-out, padding 0.3s ease-out; background-color: #fff; }
-        .accordion-content .inner-content { padding: 20px 0; margin: 0; }
-        
-        @media (max-width: 992px) {
-            .hamburger-menu, #back-button { display: flex !important; } 
-            .sidebar { transform: translateX(100%); z-index: 1000;}
-            html[dir="ltr"] .sidebar { transform: translateX(-100%); }
-            .sidebar.open { transform: translateX(0); }
-            .main-content { margin: 0 !important; padding: 20px; padding-top: 70px; width: 100%; }
-        }
-
-        /* شاشة القفل */
-        #lock-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: var(--primary-color);
-            color: #fff;
-            display: none; 
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            text-align: center;
-            padding: 20px;
-        }
-
-        #password-input {
-            padding: 15px;
-            margin-top: 20px;
-            border: none;
-            border-radius: 8px;
-            width: 80%;
-            max-width: 300px;
-            font-size: 1.1em;
-            text-align: center;
-        }
-
-        #password-submit {
-            padding: 10px 30px;
-            margin-top: 15px;
-            border: none;
-            border-radius: 8px;
-            background-color: var(--success-color);
-            color: #fff;
-            font-weight: 700;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        #password-submit:hover {
-            background-color: #1e7e34;
-        }
-
-        #error-message {
-            color: var(--danger-color);
-            margin-top: 10px;
+            display: block;
+            padding: 10px 0;
+            text-decoration: none;
             font-weight: 600;
+            color: #ccc;
+            transition: color 0.2s;
+        }
+        .sidebar ul li a:hover { color: var(--accent-color); }
+        .sidebar ul li a.active { color: var(--accent-color); font-weight: 700; }
+        #lang-toggle { background: var(--accent-color); color: var(--text-color); border-radius: 4px; padding: 5px 10px; margin-bottom: 15px; border: none; font-weight: 700;}
+
+
+        /* المحتوى الرئيسي */
+        .main-content { 
+            width: 100%;
+            padding: 20px; 
+            padding-top: 80px; 
+            text-align: center;
+        }
+        
+        /* تصميم البطاقات (Clean Cards) */
+        .card {
+            background-color: #fff; 
+            border-radius: 12px; 
+            padding: 30px; 
+            margin-bottom: 25px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05); 
+            border-top: 4px solid var(--primary-color);
+            text-align: right;
+            max-width: 600px;
+            margin: 20px auto;
+        }
+        .card h3, .card h4 { 
+            color: var(--header-color); 
+            font-weight: 700;
+            margin-top: 0;
+            padding-bottom: 10px;
+        }
+
+        /* شاشة بدء اللعبة */
+        #start-screen h1 {
+            color: var(--primary-color);
+            font-size: 2.5em;
+            margin-top: 50px;
+        }
+        #start-button {
+            padding: 15px 40px;
+            background-color: var(--accent-color);
+            color: var(--text-color);
+            border-radius: 10px;
+            font-size: 1.3em;
+            font-weight: 800;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 4px var(--primary-color); 
+            transition: all 0.1s;
+        }
+        #start-button:active {
+            transform: translateY(4px);
+            box-shadow: 0 0 var(--primary-color);
+        }
+
+        /* سيناريو الإجراءات */
+        .scenario-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            text-align: right;
+        }
+        .action-option {
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid var(--primary-color);
+            cursor: pointer;
+            transition: background-color 0.2s, border-color 0.2s;
+            font-weight: 600;
+            background-color: #fff;
+            position: relative;
+        }
+        .action-option.selected {
+            background-color: #e0f7fa;
+            border-color: var(--accent-color);
+        }
+        
+        /* الأزرار في شاشة السيناريو */
+        #submit-scenario, #next-scenario, #skip-scenario {
+            padding: 12px 20px; /* تصغير الهامش الداخلي قليلاً */
+            border-radius: 8px;
+            margin: 10px 5px; /* هامش حول الأزرار */
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            display: inline-block;
+        }
+        #submit-scenario {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        #next-scenario {
+            background-color: var(--accent-color);
+            color: var(--text-color);
+        }
+        #skip-scenario { /* تصميم زر التجاوز */
+            background-color: #ccc;
+            color: var(--text-color);
+        }
+
+        
+        /* شاشة التقييم (Feedback) */
+        .feedback-item {
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+        .feedback-item.correct { background-color: #e6ffe6; color: var(--success-color); border-right: 5px solid var(--success-color); }
+        .feedback-item.incorrect { background-color: #ffe6e6; color: var(--danger-color); border-right: 5px solid var(--danger-color); }
+        .feedback-item span { margin-left: 10px; font-size: 1.2em; }
+
+        
+        /* شاشات سطح المكتب */
+        @media (min-width: 993px) {
+             .container { max-width: 100%; flex-direction: row; align-items: flex-start; }
+             .sidebar { transform: translateX(0); position: sticky; } 
+             .main-content { 
+                 padding-top: 40px; 
+                 width: calc(100% - var(--sidebar-width)); 
+                 margin: 0;
+             }
+             html[dir="rtl"] .main-content { 
+                margin-right: var(--sidebar-width); 
+             }
+             html[dir="ltr"] .main-content { 
+                margin-left: var(--sidebar-width); 
+             }
+             .hamburger-menu, #back-button { display: none !important; }
         }
     </style>
 </head>
 <body>
     
-    <!-- شاشة إدخال كلمة المرور -->
-    <div id="lock-screen">
-        <h2>المرجع التفاعلي لبروتوكول داء الكلب</h2>
-        <p>يرجى إدخال كلمة السر للمتابعة:</p>
-
-        <!-- منطقة إدخال كلمة السر -->
-        <input type="password" id="password-input" placeholder="كلمة المرور">
-        <button id="password-submit">دخول</button>
-        <p id="error-message" style="display: none;">كلمة المرور خاطئة. حاول مجدداً.</p>
-
-        <!-- حقوق النشر في الأسفل -->
-        <div style="font-size: 0.9em; color: rgba(255, 255, 255, 0.7); max-width: 90%; margin-top: auto; padding-bottom: 20px;">
-            <p style="margin: 5px 0; font-weight: 700;">
-                حقوق النشر © 2024. جميع الحقوق محفوظة.
-            </p>
-            <p style="margin: 5px 0;">
-                المطور: حميدوش عبد التواب، مختص في حفظ الصحة.
-            </p>
-            <p style="margin: 5px 0;">
-                مصلحة علم الأوبئة والطب الوقائي، المؤسسة العمومية للصحة الجوارية برج منايل.
-            </p>
-            <p style="margin: 5px 0;">
-                للتواصل: abdeetouab@gmail.com
-            </p>
-        </div>
-        <!-- نهاية حقوق النشر على شاشة القفل -->
-    </div>
-
-    <!-- زر الرجوع -->
+    <!-- زر الرجوع (يظهر فقط على الجوال) -->
     <button id="back-button">
         &larr;
     </button>
     <button class="hamburger-menu" id="hamburger-menu">☰</button>
+    
     <div class="container">
+        <!-- الشريط الجانبي (يستخدم الآن كقائمة تنقل) -->
         <nav class="sidebar" id="sidebar">
              <!-- Sidebar content will be populated by JavaScript -->
         </nav>
         <main class="main-content" id="main-content">
-             <!-- Main content will be populated by JavaScript -->
+             <!-- المحتوى سيبدأ بشاشة البدء -->
         </main>
     </div>
 
@@ -225,326 +268,517 @@
             المؤسسة: مصلحة علم الأوبئة والطب الوقائي، المؤسسة العمومية للصحة الجوارية، برج منايل.
             البريد الإلكتروني: abdeetouab@gmail.com
             سنة الإنشاء: 2024.
-            
-            جميع حقوق النشر محفوظة (All Rights Reserved). يُمنع منعاً باتاً النسخ أو إعادة استخدام الكود المصدري أو المحتوى لأغراض تجارية دون إذن كتابي مسبق من المطور.
-            بصمة الكود: HMDSH-ABDTWB-2024-RABIES-V1
             ------------------------------------------------------------------
         */
         
-        // [حماية تقنية بسيطة: منع النقر بزر الماوس الأيمن وفتح أدوات المطور]
-        document.addEventListener('contextmenu', e => e.preventDefault());
-        document.addEventListener('keydown', e => {
-            if (e.keyCode === 123) { e.preventDefault(); } // F12
-            if (e.ctrlKey && e.shiftKey && e.keyCode === 73) { e.preventDefault(); } // Ctrl+Shift+I
-        });
+        let currentLang = 'ar'; 
+        let currentScenarioIndex = 0;
+        let userAnswers = [];
+        let shuffledScenarios = []; 
 
-        // [كلمة السر]
-        const MASTER_PASSWORD = "ABDEETOUAB";
-
-
-        const copyrightAr = `
-            <section id="footer-copyright" class="content-section" style="padding: 0;">
-                <div class="card" style="text-align: center; font-size: 0.9em; color: #666; padding: 20px 30px; margin-top: 0;">
-                    <p style="margin-bottom: 5px; font-weight: 700;">
-                        حقوق النشر © 2024. جميع الحقوق محفوظة.
-                    </p>
-                    <p style="margin-bottom: 5px;">
-                        المطور: حميدوش عبد التواب، مختص في حفظ الصحة.
-                    </p>
-                    <p style="margin-bottom: 0;">
-                        مصلحة علم الأوبئة والطب الوقائي، المؤسسة العمومية للصحة الجوارية برج منايل.
-                    </p>
-                    <p style="margin-top: 5px; font-size: 0.8em;">
-                        للتواصل: abdeetouab@gmail.com
-                    </p>
-                </div>
-            </section>
-        `;
-
-        const copyrightFr = `
-            <section id="footer-copyright" class="content-section" style="padding: 0;">
-                <div class="card" style="text-align: center; font-size: 0.9em; color: #666; padding: 20px 30px; margin-top: 0;">
-                    <p style="margin-bottom: 5px; font-weight: 700;">
-                        Copyright © 2024. Tous droits réservés.
-                    </p>
-                    <p style="margin-bottom: 5px;">
-                        Développé par: Hamidouche Abdeetouab, Spécialiste en Santé Publique.
-                    </p>
-                    <p style="margin-bottom: 0;">
-                        Service d'Épidémiologie et de Médecine Préventive, E.P.S.P. Bordj Menaiel.
-                    </p>
-                    <p style="margin-top: 5px; font-size: 0.8em;">
-                        Contact: abdeetouab@gmail.com
-                    </p>
-                </div>
-            </section>
-        `;
-
-
-        const contentData = {
-            ar: {
-                sidebar_title: "المرجع الشامل", lang_toggle_text: "Français", search_placeholder: "ابحث في الدليل...",
-                nav_simulator: "🤖 محاكي السيناريوهات", nav_intro: "📜 مقدمة", nav_rules: "⭐ قواعد ذهبية", nav_risk: "🔍 تقييم الخطر",
-                nav_comparison: "⚖️ مقارنة اللقاحات", nav_igar: "💉 الغلوبيولين المناعي", nav_cellular: "🧪 اللقاح الخلوي", nav_tissue: "🧠 اللقاح العصبي",
-                nav_special: "⚠️ حالات خاصة", nav_prevention: "🛡️ الوقاية",
-                simulator_title: "محاكي السيناريوهات التفاعلي", simulator_p1: "اختبر أي حالة لتحديد الإجراء الصحيح فورًا.",
-                simulator_exposure_label: "1. اختر نوع التعرض:",
-                exp_op1: "لعق على جلد سليم", exp_op2: "خدش بسيط بدون نزيف (ساق/ذراع)", exp_op3: "عضة نازفة (أي مكان)", exp_op4: "خدش بسيط في اليد/الوجه",
-                simulator_animal_label: "2. اختر نوع الحيوان:",
-                animal_op1: "كلب أو قطة", animal_op2: "فأر أو جرذ", animal_op3: "خفاش أو حيوان بري",
-                simulator_vaccine_label: "3. هل تلقيت تلقيحًا كاملاً سابقًا؟",
-                vac_op1: "لا (أو غير متأكد)", vac_op2: "نعم (موثق)",
-                result_title: "النتيجة والتشخيص:", result_cat: "الفئة:", result_action: "الإجراء المطلوب:", result_just: "التعليل الرسمي:",
-                comparison_title: "مقارنة سريعة: اللقاح الخلوي مقابل اللقاح العصبي",
-                comp_feature: "الميزة", comp_cellular: "اللقاح الخلوي (المستورد)", comp_tissue: "اللقاح العصبي (المحلي)",
-                comp_f1: "الفعالية والأمان", comp_c1: "عالية جدًا", comp_t1: "جيدة (أقل من الخلوي)",
-                comp_f2: "الجرعات (لغير الملقح)", comp_c2: "4 جرعات (بروتوكول زغرب/إيسن)", comp_t2: "6 جرعات (بروتوكول طويل)",
-                comp_f3: "قاعدة التأخير (> 24 ساعة)", comp_c3: "<strong>لا تعيد السلسلة</strong>. أكمل الجدول الزمني بعد أخذ الجرعة الفائتة.", comp_t3: "<strong>يجب إعادة السلسلة كاملة</strong> من البداية (خاصة للجرعات الأولى).",
-                intro_html: `<h3>مقدمة: لماذا هذا الدليل مهم؟</h3><p>داء الكلب (السعار) مرض فيروسي مميت بنسبة 100% تقريبًا بمجرد ظهور الأعراض. ومع ذلك، يمكن الوقاية منه بالكامل إذا تم اتخاذ الإجراءات الصحيحة فورًا بعد التعرض.</p><p>هذا الدليل يلخص أحدث تعليمات وزارة الصحة الجزائرية (يوليو 2024)، والتي تستند إلى توصيات منظمة الصحة العالمية، لمساعدتك على فهم الخطوات الحاسمة لإنقاذ الحياة.</p><h4>الوضع في الجزائر (سنويًا):</h4><ul><li><strong>~900 حالة</strong> داء كلب حيواني.</li><li><strong>~140,000 شخص</strong> معرضون للخطر.</li><li><strong>15 إلى 20 حالة وفاة بشرية</strong> للأسف.</li></ul><p><strong>الهدف الوطني:</strong> الوصول إلى "صفر وفيات بشرية بسبب داء الكلب المنقول من الكلاب بحلول 2030".</p>`,
-                rules_html: `<div class="card"><h3>الإسعافات الأولية الفورية</h3><ul><li><strong>الغسل الفوري:</strong> اغسل الجرح جيدًا وعميقًا بالماء الجاري والصابون لمدة <strong>15 دقيقة على الأقل</strong>. هذا الإجراء الميكانيكي هو أهم خطوة لتقليل كمية الفيروس.</li><li><strong>التطهير:</strong> بعد الغسل، قم بتطبيق مطهر مثل الكحول (70%) أو محلول اليود (البوفيدون اليودي).</li></ul></div><div class="card"><h3>القواعد الذهبية للتعامل الطبي</h3><ul class="golden-rules"><li class="rule-do">✅ توجه إلى أقرب مركز صحي <strong>فورًا</strong>، مهما كانت الإصابة تبدو بسيطة.</li><li class="rule-do">✅ ابدأ العلاج الوقائي <strong>فورًا</strong> ولا تنتظر نتائج فحص الحيوان أو فترة مراقبته.</li><li class="rule-dont">❌ لا تقم أبدًا بخياطة الجرح (Suture) في البداية. إذا كانت الخياطة ضرورية لاحقًا، يجب أن تتم بعد حقن IGAR حوله.</li><li class="rule-dont">❌ لا تقم بتغطية الجرح بضمادة. الفيروس حساس للهواء والضوء.</li></ul></div>`,
-                risk_html: `<div class="card"><h3>تقييم الخطر: أساس تحديد العلاج</h3><p>يعتمد تحديد العلاج على 3 عوامل: فئة التعرض، نوع الحيوان، وحالة الحيوان.</p><h4>1. فئات التعرض</h4><table><thead><tr><th>الفئة</th><th>وصف التعرض</th><th>الإجراء المطلوب</th></tr></thead><tbody><tr><td><strong>الأولى (I)</strong></td><td>لمس حيوان، إطعامه، أو لعق على جلد سليم.</td><td>غسل المنطقة فقط. <strong>لا داعي للعلاج</strong>.</td></tr><tr><td><strong>الثانية (II)</strong></td><td>خدش بسيط أو عضة سطحية بدون نزيف (في غير المناطق الخطرة).</td><td>تنظيف الجرح + <strong>لقاح فوري</strong>.</td></tr><tr><td><strong>الثالثة (III)</strong></td><td>- أي عضة/خدش في الرأس، الرقبة، اليدين، القدمين.<br>- أي عضة نازفة أو عميقة.<br>- أي تعرض من حيوان بري (خفاش).<br>- لعق على جرح مفتوح أو أغشية مخاطية.</td><td>تنظيف الجرح + <strong>لقاح فوري</strong> + <strong>حقن IGAR</strong>.</td></tr></tbody></table><h4>2. أنواع الحيوانات</h4><table><tbody><tr><td><strong>لا تتطلب علاجًا وقائيًا</strong></td><td>القوارض الصغيرة (فأر، جرذ)، الأرانب، الطيور، الزواحف.</td></tr><tr><td><strong>تتطلب علاجًا وقائيًا</strong></td><td>حيوانات المزرعة (أبقار، خيول، أغنام).</td></tr><tr><td><strong>تتطلب علاجًا وقائيًا بشدة</strong></td><td>الكلاب، القطط، والحيوانات البرية (ثعلب، خفاش).</td></tr></tbody></table><h4>3. حالة الحيوان</h4><ul><li><strong>معروف وحي:</strong> يوضع تحت المراقبة البيطرية لمدة 15 يومًا. (لكن العلاج يبدأ فورًا ولا ينتظر).</li><li><strong>هارب أو بري:</strong> يعتبر مسعورًا حتمًا.</li><li><strong>ميت أو مقتول:</strong> يُرسل رأسه للفحص في معهد باستور.</li></ul></div>`,
-                igar_html: `<div class="card"><h3>الغلوبيولين المناعي (IGAR): الحماية الفورية</h3><h4>ما هو IGAR؟</h4><p>هو عبارة عن أجسام مضادة جاهزة (مناعة سلبية) تُعطى لتوفير حماية فورية في موقع الإصابة، ريثما يبدأ اللقاح في تحفيز مناعة الجسم النشطة.</p><h4>متى يُستخدم؟</h4><ul><li><strong>إلزامي</strong> في حالات التعرض من <strong>الفئة الثالثة (III)</strong> لدى الأشخاص أصحاب المناعة السليمة.</li><li><strong>إلزامي</strong> في حالات <strong>الفئة الثانية (II) أو الثالثة (III)</strong> لدى الأشخاص ناقصي المناعة.</li></ul></div><div class="card"><h3>الجرعة وطريقة الإعطاء</h3><ul><li><strong>الجرعة:</strong> 40 وحدة دولية (UI) لكل كيلوغرام من وزن الجسم، بحد أقصى 3000 UI.</li><li><strong>التوقيت:</strong> يُعطى <strong>مرة واحدة فقط</strong> في اليوم الأول (J0) مع أول جرعة لقاح. لا فائدة منه بعد 7 أيام من بدء التطعيم.</li><li><strong>طريقة الحقن (الأهم):</strong> يجب حقن أكبر كمية ممكنة من الجرعة (ويفضل كلها) عن طريق <strong>التسريب الموضعي (Infiltration) داخل وحول جميع الجروح</strong>. إذا تبقت كمية، تُحقن في العضل بعيدًا عن مكان حقن اللقاح.</li><li><strong>ملاحظة:</strong> إذا كانت الجروح صغيرة والكمية كبيرة، يمكن تخفيف المصل بمحلول ملحي لتسهيل توزيعه.</li></ul></div>`,
-                cellular_vaccine_html: `<div class="card"><h3>اللقاح الخلوي (VAR-VC): الخيار الأول والمفضل</h3><h4>معلومات أساسية</h4><ul><li><strong>المصدر:</strong> مستورد، محضّر على زراعة الخلايا (culture cellulaire).</li><li><strong>المميزات:</strong> يعتبر الأكثر فعالية وأمانًا، ويتطلب عدد جرعات أقل.</li><li><strong>طريقة الحقن:</strong> الحقن العضلي (IM) هو المعتمد.</li></ul></div><div class="card"><h3>بروتوكولات الحقن المعتمدة</h3><h4>1. للأشخاص غير الملقحين سابقًا</h4><ul><li><strong>بروتوكول زغرب (الموصى به):</strong> 4 جرعات إجمالاً.<ul><li><strong>اليوم 0:</strong> جرعتان في نفس الوقت (واحدة في كل عضلة دالية بالذراع).</li><li><strong>اليوم 7:</strong> جرعة واحدة.</li><li><strong>اليوم 21:</strong> جرعة واحدة.</li></ul></li><li><strong>بروتوكول إيسن (بديل):</strong> 4 جرعات إجمالاً.<ul><li><strong>اليوم 0:</strong> جرعة واحدة.</li><li><strong>اليوم 3:</strong> جرعة واحدة.</li><li><strong>اليوم 7:</strong> جرعة واحدة.</li><li><strong>اليوم 14:</strong> جرعة واحدة.</li></ul></li></ul><h4>2. للأشخاص الملقحين سابقًا (بروتوكول العودة Rappel)</h4><ul><li>جرعتان فقط لتنشيط الذاكرة المناعية:<ul><li><strong>اليوم 0:</strong> جرعة واحدة.</li><li><strong>اليوم 3:</strong> جرعة واحدة.</li></ul></li><li>لا حاجة للمصل (IGAR) في هذه الحالة.</li></ul></div>`,
-                tissue_vaccine_html: `<div class="card"><h3>اللقاح العصبي (VAR-TN): الخيار البديل</h3><h4>معلومات أساسية</h4><ul><li><strong>المصدر:</strong> مُصنَّع محليًا في معهد باستور الجزائر (Institut Pasteur d’Algérie)، محضّر على نسيج عصبي (tissu nerveux).</li><li><strong>الاستخدام:</strong> يُستخدم فقط في حال عدم توفر اللقاح الخلوي.</li><li><strong>طريقة الحقن:</strong> عضليّة (IM) فقط. لا يُحقن داخل الأدمة أبدًا.</li></ul></div><div class="card"><h3>البروتوكولات الرسمية</h3><table><thead><tr><th>فئة الخطر</th><th>حالة التلقيح</th><th>عدد الجرعات</th><th>الجدول الزمني (الأيام)</th><th>المصل (IGAR)</th></tr></thead><tbody><tr><td><strong>II</strong></td><td>غير ملقح سابقًا</td><td><strong>6 جرعات</strong></td><td>0 – 3 – 7 – 14 – 30 – 90</td><td>❌ لا</td></tr><tr><td><strong>III</strong></td><td>غير ملقح سابقًا</td><td><strong>6 جرعات</strong></td><td>0 – 3 – 7 – 14 – 30 – 90</td><td>✅ نعم، في اليوم 0</td></tr><tr><td><strong>أي فئة</strong></td><td>ملقح سابقًا</td><td><strong>جرعتان</strong></td><td>0 – 3</td><td>❌ لا</td></tr></tbody></table><h4>ملاحظات هامة جدًا</h4><ul><li><strong>التأخير:</strong> إذا تجاوز التأخير في الجرعات الأولى (يوم 0 أو 3) مدة 24 ساعة، <strong>يجب إعادة السلسلة كاملة</strong>.</li><li><strong>عدم الخلط:</strong> لا تخلط اللقاح العصبي مع الخلوي في نفس سلسلة العلاج.</li><li><strong>الفعالية:</strong> يعتبر اللقاح العصبي أقل فعالية من الخلوي.</li></ul></div>`,
-                special_cases_html: `<div class="card"><h3>حالات خاصة: اعتبارات هامة</h3><div class="accordion"><div class="accordion-item"><div class="accordion-header">🤰 المرأة الحامل أو المرضعة</div><div class="accordion-content"><div class="inner-content"><p><strong>لا يوجد أي مانع على الإطلاق</strong> لتلقي العلاج الوقائي الكامل (لقاح + IGAR). داء الكلب مرض مميت، وإنقاذ حياة الأم هو الأولوية المطلقة.</p></div></div></div><div class="accordion-item"><div class="accordion-header">💉 مريض نقص المناعة</div><div class="accordion-content"><div class="inner-content"><p>يجب أن يتلقى دائمًا العلاج الوقائي الكامل (لقاح + IGAR)، <strong>حتى لو كان التعرض من الفئة الثانية</strong>. استجابته المناعية قد تكون أضعف، لذا يحتاج لأقصى حماية ممكنة.</p></div></div></div><div class="accordion-item"><div class="accordion-header">🩸 مريض يعاني من خطر النزيف</div><div class="accordion-content"><div class="inner-content"><p>لتجنب مخاطر الحقن العضلي، يتم استخدام الحقن داخل الأدمة (ID). يتم تطبيق نفس البروتوكول المفصل أدناه في حالة نقص اللقاحات.</p></div></div></div><div class="accordion-item"><div class="accordion-header">🧠 في حالة نقص كميات اللقاح الخلوي</div><div class="accordion-content"><div class="inner-content"><p>كاستراتيجية لتوفير الجرعات (Dose-sparing)، يتم استخدام الحقن داخل الأدمة (ID) بجرعة 0.1 مل فقط.<h4>البروتوكول الرسمي (الحقن داخل الأدمة ID)</h4><table><thead><tr><th>الحالة التطعيمية</th><th>البروتوكول (لقاح خلوي ID)</th></tr></thead><tbody><tr><td><strong>شخص غير ملقح سابقًا</strong></td><td>إجمالي 6 جرعات: جرعتان في موقعين مختلفين في الأيام 0، 3، و 7 + IGAR.</td></tr><tr><td><strong>شخص ملقح سابقًا</strong></td><td><strong>الخيار 1:</strong> إجمالي جرعتان: جرعة واحدة في موقع واحد في اليوم 0 واليوم 3.<br><strong>الخيار 2:</strong> إجمالي 4 جرعات: جرعة واحدة في 4 مواقع مختلفة في اليوم 0 فقط.</td></tr><tr><td><strong>الوقاية قبل التعرض (PPrEx)</strong></td><td>إجمالي 4 جرعات: جرعتان في موقعين مختلفين في اليوم 0 واليوم 7.</td></tr></tbody></table><p><strong>ملاحظة هامة:</strong> كل جرعة (Dose) في هذا البروتوكول تساوي 0.1 مل.</p></div></div></div><div class="accordion-item"><div class="accordion-header">⏱️ شخص ملقح سابقًا</div><div class="accordion-content"><div class="inner-content"><p>إذا تعرض لعضة جديدة، لا يحتاج لبروتوكول كامل أو IGAR. يحتاج فقط لجرعتين منشطتين (بروتوكول العودة) في اليوم 0 واليوم 3 لتنشيط ذاكرته المناعية بسرعة.</p></div></div></div></div></div>`,
-                prevention_html: `<div class="card"><h3>الوقاية العامة: خير من العلاج</h3><ul><li><strong>تطعيم الحيوانات الأليفة:</strong> قم بتطعيم كلابك وقططك بانتظام. هذا هو خط الدفاع الأول والأكثر فعالية.</li><li><strong>تجنب الحيوانات الضالة والبرية:</strong> لا تقترب من حيوان لا تعرفه، خاصة إذا كان يتصرف بغرابة.</li><li><strong>تعليم الأطفال:</strong> علمهم عدم لمس أو إطعام الحيوانات الغريبة.</li></ul></div><div class="card"><h3>الوقاية قبل التعرض (PPrEx)</h3><p>هي سلسلة تطعيم وقائية تُعطى للأشخاص المعرضين لخطر كبير بحكم عملهم (أطباء بيطريون، حراس غابات، عمال المخابر، إلخ).</p><ul><li><strong>البروتوكول:</strong> جرعتان من اللقاح الخلوي في اليوم 0 واليوم 7.</li><li><strong>الفائدة:</strong> في حال التعرض لعضة لاحقًا، يحتاج الشخص لجرعتي لقاح فقط (بروتوكول العودة) ولا يحتاج أبدًا للـ IGAR.</li></ul></div>`
-            },
-            fr: {
-                sidebar_title: "Guide Complet", lang_toggle_text: "العربية", search_placeholder: "Rechercher dans le guide...",
-                nav_simulator: "🤖 Simulateur de Scénarios", nav_intro: "📜 Introduction", nav_rules: "⭐ Règles d'Or", nav_risk: "🔍 Évaluation du Risque",
-                nav_comparison: "⚖️ Comparaison des Vaccins", nav_igar: "💉 Immunoglobulines (IGAR)", nav_cellular: "🧪 Vaccin Cellulaire (VAR-VC)", nav_tissue: "🧠 Vaccin Tissulaire (VAR-TN)",
-                nav_special: "⚠️ Cas Particuliers", nav_prevention: "🛡️ Prévention",
-                simulator_title: "Simulateur de Scénarios Interactif", simulator_p1: "Testez n'importe quelle situation pour déterminer instantanément la bonne conduite à tenir.",
-                simulator_exposure_label: "1. Choisissez le type d'exposition :",
-                exp_op1: "Léchage sur peau intacte", exp_op2: "Griffure mineure sans saignement (jambe/bras)", exp_op3: "Morsure avec saignement (n'importe où)", exp_op4: "Griffure mineure (main/visage)",
-                simulator_animal_label: "2. Choisissez le type d'animal :",
-                animal_op1: "Chien ou chat", animal_op2: "Souris ou rat", animal_op3: "Chauve-souris ou animal sauvage",
-                simulator_vaccine_label: "3. Avez-vous déjà reçu une vaccination complète ?",
-                vac_op1: "Non (ou incertain)", vac_op2: "Oui (documenté)",
-                result_title: "Résultat et Diagnostic :", result_cat: "Catégorie :", result_action: "Conduite à tenir :", result_just: "Justification officielle :",
-                comparison_title: "Comparaison Rapide : Vaccin Cellulaire vs. Tissulaire",
-                comp_feature: "Caractéristique", comp_cellular: "Vaccin Cellulaire (Importé)", comp_tissue: "Vaccin Tissulaire (Local)",
-                comp_f1: "Efficacité et Sécurité", comp_c1: "Très élevée", comp_t1: "Bonne (inférieure au cellulaire)",
-                comp_f2: "Doses (non-vacciné)", comp_c2: "4 doses (Protocole Zagreb/Essen)", comp_t2: "6 doses (Protocole long)",
-                comp_f3: "Règle du retard (> 24h)", comp_c3: "<strong>Ne pas redémarrer la série</strong>. Continuer le calendrier après administration de la dose manquée.", comp_t3: "<strong>La série doit être entièrement redémarrée</strong> (surtout pour les premières doses).",
-                intro_html: `<h3>Introduction : Pourquoi ce guide est-il important؟</h3><p>La rage est une maladie virale mortelle à près de 100% une fois les symptômes apparus. Cependant، elle est entièrement évitable si les bonnes mesures sont prises immédiatement après l'exposition.</p><p>Ce guide résume les dernières instructions du Ministère de la Santé algérien (Juillet 2024)، basées على les recommandations de l'OMS، pour vous aider à comprendre les étapes cruciales qui sauvent des vies.</p><h4>Situation en Algérie (annuellement) :</h4><ul><li><strong>~900 cas</strong> de rage animale.</li><li><strong>~140,000 personnes</strong> exposées au risque.</li><li><strong>15 à 20 décès humains</strong> malheureusement.</li></ul><p><strong>Objectif National:</strong> Atteindre "zéro décès humain dû à la rage transmise par les chiens d'ici 2030".</p>`,
-                rules_html: `<div class="card"><h3>Premiers Soins Immédiats</h3><ul><li><strong>Lavage immédiat :</strong> Lavez la plaie abondamment et en profondeur avec de l'eau courante et du savon pendant <strong>au moins 15 minutes</strong>. Cette action mécanique est l'étape la plus cruciale pour réduire la charge virale.</li><li><strong>Désinfection :</strong> Après le lavage، appliquez un antiseptique comme l'alcool (70%) ou une solution iodée (povidone iodée).</li></ul></div><div class="card"><h3>Règles d'Or de la Prise en Charge Médicale</h3><ul class="golden-rules"><li class="rule-do">✅ Rendez-vous au centre de santé le plus proche <strong>immédiatement</strong>، même si la blessure semble mineure.</li><li class="rule-do">✅ Commencez la prophylaxie post-exposition (PPE) <strong>immédiatement</strong> sans attendre les résultats de l'examen de l'animal.</li><li class="rule-dont">❌ Ne suturez jamais la plaie initialement. Si une suture est nécessaire plus tard، elle doit être faite après infiltration d'IGAR.</li><li class="rule-dont">❌ Ne couvrez pas la plaie with a pansement. Le virus est sensible à l'air و à la lumière.</li></ul></div>`,
-                risk_html: `<div class="card"><h3>Évaluation du Risque : Base de la Décision Thérapeutique</h3><p>La détermination du traitement approprié dépend de 3 facteurs : la catégorie d'exposition، l'espèce animale et l'état de l'animal.</p><h4>1. Catégories d'Exposition</h4><table><thead><tr><th>Catégorie</th><th>Description</th><th>Conduite à Tenir</th></tr></thead><tbody><tr><td><strong>I</strong></td><td>Contact simple، alimentation d'un animal، léchage sur peau intacte.</td><td>Lavage de la zone. <strong>Aucun traitement</strong>.</td></tr><tr><td><strong>II</strong></td><td>Griffure mineure ou morsure superficielle sans saignement (hors zones à risque).</td><td>Nettoyage + <strong>Vaccination immédiate</strong>.</td></tr><tr><td><strong>III</strong></td><td>- Toute exposition à la tête، cou، mains، pieds.<br>- Toute morsure profonde او with saignement.<br>- Exposition à un animal sauvage (chauve-souris).<br>- Léchage sur peau lésée أو muqueuses.</td><td>Nettoyage + <strong>Vaccination immédiate</strong> + <strong>Injection d'IGAR</strong>.</td></tr></tbody></table><h4>2. Espèces Animales</h4><table><tbody><tr><td><strong>Pas de prophylaxie requise</strong></td><td>Petits rongeurs (souris، rats)، lapins، oiseaux، reptiles.</td></tr><tr><td><strong>Prophylaxie requise</strong></td><td>Animaux d'élevage (bovins، chevaux).</td></tr><tr><td><strong>Prophylaxie fortement indiquée</strong></td><td>Chiens، chats، animaux sauvاج (renard، chauve-souris).</td></tr></tbody></table><h4>3. État de l'Animal</h4><ul><li><strong>Connu et vivant:</strong> Mettre sous observation vétérinaire pendant 15 jours (le traitement commence sans attendre).</li><li><strong>En fuite ou sauvage:</strong> Considéré comme potentiellement enragé.</li><li><strong>Mort ou abattu:</strong> Envoyer sa tête pour analyse à l'Institut Pasteur.</li></ul></div>`,
-                igar_html: `<div class="card"><h3>Immunoglobulines Antirabiques (IGAR) : Protection Immédiate</h3><h4>Qu'est-ce que l'IGAR؟</h4><p>Ce sont des anticorps prêts à l'emploi (immunité passive) administrés pour une protection immédiate sur le site de la blessure، en attendant que le vaccin stimule l'immunité active.</p><h4>Quand l'utiliser ؟</h4><ul><li><strong>Obligatoire</strong> pour les expositions de <strong>Catégorie III</strong> chez les personnes immunocompétentes.</li><li><strong>Obligatoire</strong> pour les expositions de <strong>Catégorie II ou III</strong> chez les personnes immunodéprimées.</li></ul></div><div class="card"><h3>Posologie et Administration</h3><ul><li><strong>Posologie :</strong> 40 UI/kg de poids corporel (max 3000 UI).</li><li><strong>Timing :</strong> <strong>Une seule fois</strong> à J0 with the première dose de vaccin. Inutile après 7 jours.</li><li><strong>Mode d'injection (Le plus important) :</strong> La plus grande quantité possible doit être administrée par <strong>infiltration locale dans et autour de toutes les plaies</strong>. Le reste en IM، loin du site du vaccin.</li><li><strong>Note :</strong> Si les plaies sont petites، le sérum peut être dilué avec une solution saline.</li></ul></div>`,
-                cellular_vaccine_html: `<div class="card"><h3>Vaccin sur Culture Cellulaire (VAR-VC) : Le Premier Choix</h3><h4>Informations de base</h4><ul><li><strong>Source :</strong> Importé، préparé sur culture cellulaire.</li><li><strong>Avantages :</strong> Le plus efficace et sûr، moins de doses requises.</li><li><strong>Mode d'injection :</strong> Intramusculaire (IM) est la norme.</li></ul></div><div class="card"><h3>Protocoles d'Injection</h3><h4>1. Pour les non-vaccinés</h4><ul><li><strong>Protocole de Zagreb (recommandé) :</strong> 4 doses.<ul><li><strong>J0 :</strong> 2 doses simultanément (1 dans chaque deltoïde).</li><li><strong>J7 :</strong> 1 dose.</li><li><strong>J21 :</strong> 1 dose.</li></ul></li><li><strong>Protocole d'Essen (alternatif) :</strong> 4 doses.<ul><li><strong>J0، J3، J7، J14 :</strong> 1 dose à chaque fois.</li></ul></li></ul><h4>2. Pour les personnes déjà vaccinées (Rappel)</h4><ul><li>Deux doses seulement :<ul><li><strong>J0 :</strong> 1 dose.</li><li><strong>J3 :</strong> 1 dose.</li></ul></li><li>Pas besoin d'IGAR.</li></ul></div>`,
-                tissue_vaccine_html: `<div class="card"><h3>Vaccin sur Tissu Nerveux (VAR-TN) : L'Alternative</h3><h4>Informations de base</h4><ul><li><strong>Source :</strong> Produit localement (Institut Pasteur d’Algérie)، préparé sur tissu nerveux.</li><li><strong>Utilisation :</strong> Uniquement en cas d'indisponibilité du vaccin cellulaire.</li><li><strong>Mode d'injection :</strong> Intramusculaire (IM) uniquement. Jamais en intradermique.</li></ul></div><div class="card"><h3>Protocoles Officiels</h3><table><thead><tr><th>Catégorie</th><th>Statut Vaccinal</th><th>Doses</th><th>Calendrier (Jours)</th><th>Sérum (IGAR)</th></tr></thead><tbody><tr><td><strong>II</strong></td><td>Non vacciné</td><td><strong>6 doses</strong></td><td>0، 3، 7، 14، 30، 90</td><td>❌ Non</td></tr><tr><td><strong>III</strong></td><td>Non vacciné</td><td><strong>6 doses</strong></td><td>0، 3، 7، 14، 30، 90</td><td>✅ Oui، à J0</td></tr><tr><td><strong>Toute cat.</strong></td><td>Déjà vacciné</td><td><strong>2 doses</strong></td><td>0، 3</td><td>❌ Non</td></tr></tbody></table><h4>Notes Très Importantes</h4><ul><li><strong>Retard :</strong> Si un retard > 24h survient pour les premières doses (J0، J3)، <strong>la série doit être recommencée</strong>.</li><li><strong>Ne pas mélانج:</strong> Ne pas alterner les types de vaccin dans une même série.</li><li><strong>Efficacité :</strong> Moins efficace من le vaccin cellulaire.</li></ul></div>`,
-                special_cases_html: `<div class="card"><h3>حالات خاصة: اعتبارات هامة</h3><div class="accordion"><div class="accordion-item"><div class="accordion-header">🤰 Femme enceinte او allaitante</div><div class="accordion-content"><div class="inner-content"><p>Il n'y a <strong>aucune contre-indication</strong> à recevoir la PPE complète (vaccin + IGAR). La rage est mortelle، و إنقاذ حياة الأم هو الأولوية المطلقة.</p></div></div></div><div class="accordion-item"><div class="accordion-header">💉 Patient immunodéprimé</div><div class="accordion-content"><div class="inner-content"><p>Doit toujours recevoir la PPE complète (vaccin + IGAR)، <strong>même pour une exposition de catégorie II</strong>. استجابته المناعية قد تكون أضعف، لذا يحتاج لأقصى حماية ممكنة.</p></div></div></div><div class="accordion-item"><div class="accordion-header">🩸 Patient avec risque hémorragique</div><div class="accordion-content"><div class="inner-content"><p>Pour éviter les risques de l'injection IM، l'injection intradermique (ID) est utilisée. Le même protocole que ci-dessous est appliqué.</p></div></div></div><div class="accordion-item"><div class="accordion-header">🧠 En cas de rupture de stock du vaccin cellulaire</div><div class="accordion-content"><div class="inner-content"><p>Comme stratégie d'épargنة (Dose-sparing)، la voie intradermique (ID) est utilisée with a dose de 0.1 ml.<h4>Protocole Officiel (Voie Intradermique ID)</h4><table><thead><tr><th>Statut Vaccinal</th><th>Schéma (vaccin cellulaire ID)</th></tr></thead><tbody><tr><td><strong>Personne non vaccinée</strong></td><td>Total 6 doses : 2 doses sur 2 sites à J0، J3، et J7 + IGAR.</td></tr><tr><td><strong>Personne déjà vaccinée</strong></td><td><strong>Schéma 1 :</strong> Total 2 doses : 1 dose sur 1 site à J0 et J3.<br><strong>Schéma 2 :</strong> Total 4 doses : 1 dose sur 4 sites à J0 uniquement.</td></tr><tr><td><strong>Prophylaxie Pré-exposition (PPrEx)</strong></td><td>Total 4 doses : 2 doses sur 2 sites à J0 et J7.</td></tr></tbody></table><p><strong>Note importante:</strong> Chaque dose (Dose) dans ce protocole est égale à 0.1 ml.</p></div></div></div><div class="accordion-item"><div class="accordion-header">⏱️ Personne déjà vaccinée</div><div class="accordion-content"><div class="inner-content"><p>En cas de nouvelle exposition، elle n'a besoin que de deux doses de rappel (protocole de rappel) à J0 et J3.</p></div></div></div></div></div>`,
-                prevention_html: `<div class="card"><h3>الوقاية العامة: خير من العلاج</h3><ul><li><strong>تطعيم الحيوانات الأليفة:</strong> قم بتطعيم كلابك وقططك بانتظام. هذا هو خط الدفاع الأول والأكثر فعالية.</li><li><strong>تجنب الحيوانات الضالة والبرية:</strong> لا تقترب من حيوان لا تعرفه، خاصة إذا كان يتصرف بغرابة.</li><li><strong>تعليم الأطفال:</strong> علمهم عدم لمس أو إطعام الحيوانات الغريبة.</li></ul></div><div class="card"><h3>الوقاية قبل التعرض (PPrEx)</h3><p>هي سلسلة تطعيم وقائية تُعطى للأشخاص المعرضين لخطر كبير بحكم عملهم (أطباء بيطريون، حراس غابات، عمال المخابر، إلخ).</p><ul><li><strong>البروتوكول:</strong> جرعتان من اللقاح الخلوي في اليوم 0 واليوم 7.</li><li><strong>الفائدة:</strong> في حال التعرض لعضة لاحقًا، يحتاج الشخص لجرعتي لقاح فقط (بروتوكول العودة) ولا يحتاج أبدًا للـ IGAR.</li></ul></div>`
+        function shuffleArray(array) {
+            let newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
             }
+            return newArray;
+        }
+
+        // =========================================================
+        // 1. البيانات (السيناريوهات الـ 30)
+        // =========================================================
+
+        const scenariosMaster = {
+            ar: [
+                { title: "السيناريو 1: الخدش السطحي", description: "طفل (7 سنوات) تعرض لخدش بواسطة قطة ضالة في ساقه، الخدش سطحي ولا ينزف، والقطة هربت.", options: [ { text: "غسل الجرح بالماء والصابون 15 دقيقة.", correct: true }, { text: "تطهير الجرح بالكحول أو اليود.", correct: true }, { text: "تطعيم فوري بـ VAR-VC (اللقاح الخلوي).", correct: true }, { text: "حقن الغلوبيولين المناعي (IGAR).", correct: false }, { text: "خياطة الجرح فورًا.", correct: false }, { text: "مراقبة القطة لمدة 15 يوماً قبل بدء العلاج.", correct: false }, ], category: "الفئة II" },
+                { title: "السيناريو 2: عضة الثعلب البري", description: "شاب تعرض لعضة عميقة ونازفة في إصبع يده، الحيوان المهاجم هو ثعلب بري تم قتله في المكان.", options: [ { text: "غسل وتطهير الجرح 15 دقيقة.", correct: true }, { text: "تطعيم فوري بـ VAR-VC.", correct: true }, { text: "حقن IGAR موضعياً حول الجرح.", correct: true }, { text: "إرسال رأس الثعلب للفحص المعملي.", correct: true }, { text: "إعطاء المصل عن طريق العضل فقط.", correct: false }, ], category: "الفئة III" },
+                { title: "السيناريو 3: لعق على جلد سليم", description: "مزارع تعرض للعق كلب كان يطعمه على جلد سليم تماماً، بدون وجود أي جروح أو خدوش.", options: [ { text: "غسل المنطقة بالماء والصابون.", correct: true }, { text: "تطعيم بـ VAR-VC.", correct: false }, { text: "إعطاء IGAR.", correct: false }, { text: "مراقبة الكلب لمدة 15 يوماً.", correct: true }, { text: "لا داعي لأي علاج وقائي.", correct: true }, ], category: "الفئة I" },
+                { title: "السيناريو 4: نقص المناعة", description: "مريض يتلقى علاجاً كيميائياً (ناقص مناعة) تعرض لخدش بسيط ونازف من قطة ضالة.", options: [ { text: "غسل وتطهير الجرح.", correct: true }, { text: "تطعيم فوري بـ VAR-VC.", correct: true }, { text: "حقن IGAR (الغلوبيولين المناعي).", correct: true }, { text: "تأجيل العلاج لحين استقرار مناعة المريض.", correct: false }, { text: "اكتشاف نوع اللقاح (خلوي أو عصبي) قبل البدء.", correct: false }, ], category: "حالة خاصة" },
+                { title: "السيناريو 5: عضة فأر", description: "عامل في مخزن تعرض لعضة خفيفة من فأر (جرذ) أدت لبعض النزيف.", options: [ { text: "غسل الجرح جيداً.", correct: true }, { text: "تطهير الجرح.", correct: true }, { text: "إعطاء اللقاح والمصل فوراً.", correct: false }, { text: "لا داعي للعلاج الوقائي ضد السعار.", correct: true }, ], category: "حيوانات غير خطرة" },
+                { title: "السيناريو 6: تأخير اللقاح العصبي", description: "مريض يتلقى اللقاح العصبي (VAR-TN) وتأخر عن موعد جرعة اليوم الثالث (J3) بـ 48 ساعة.", options: [ { text: "يكمل الجدول الزمني عادياً.", correct: false }, { text: "يجب إعادة السلسلة كاملة.", correct: true }, { text: "يتحول إلى اللقاح الخلوي.", correct: false }, ], category: "إجراءات متقدمة" },
+                { title: "السيناريو 7: عضة في الوجه", description: "شخص تعرض لعضة نازفة من كلب ضال في شفتيه العلوية (الوجه).", options: [ { text: "غسل الجرح 15 دقيقة.", correct: true }, { text: "تطعيم VAR-VC فوراً.", correct: true }, { text: "حقن IGAR موضعياً في الشفة.", correct: true }, { text: "تأجيل IGAR لحين التأكد من سُعار الكلب.", correct: false }, ], category: "الفئة III" },
+                { title: "السيناريو 8: ملقح سابقاً", description: "ممرض تلقى تطعيماً كاملاً ضد السعار قبل 3 سنوات، تعرض لخدش عميق من قطة.", options: [ { text: "غسل وتطهير الجرح.", correct: true }, { text: "إعطاء بروتوكول العودة (جرعتين VAR-VC).", correct: true }, { text: "حقن IGAR.", correct: false }, { text: "إعطاء 4 جرعات جديدة.", correct: false }, ], category: "ملقح سابقاً" },
+                { title: "السيناريو 9: لعق على جرح مفتوح", description: "طفل تعرض للعق كلب ضال في جرح مفتوح كان ناتجاً عن سقوط قديم.", options: [ { text: "غسل فوري للجرح.", correct: true }, { text: "تطعيم VAR-VC.", correct: true }, { text: "حقن IGAR.", correct: true }, { text: "يعتبر فئة I ولا يحتاج لعلاج.", correct: false }, ], category: "الفئة III" },
+                { title: "السيناريو 10: كلب معروف", description: "عضة غير نازفة من كلب جار معروف وموثق، والكلب وضع تحت المراقبة البيطرية.", options: [ { text: "البدء فوراً باللقاح.", correct: true }, { text: "وقف اللقاح إذا كان الكلب سليماً بعد 15 يوماً.", correct: true }, { text: "انتظار نتيجة المراقبة 15 يوماً قبل البدء.", correct: false }, { text: "حقن IGAR.", correct: false }, ], category: "الفئة II + مراقبة" },
+                { title: "السيناريو 11: عضة في اليد", description: "عضة بسيطة لكنها لم تنزف (غير عميقة) في راحة اليد من قطة ضالة.", options: [ { text: "تعتبر فئة II وتتطلب لقاح فقط.", correct: false }, { text: "تعتبر فئة III (بسبب الموقع) وتتطلب IGAR + لقاح.", correct: true }, { text: "غسل الجرح.", correct: true }, ], category: "الفئة III" },
+                { title: "السيناريو 12: تأخير اللقاح الخلوي", description: "مريض يتلقى اللقاح الخلوي (VAR-VC) وتأخر عن جرعة اليوم السابع (J7) بـ 48 ساعة.", options: [ { text: "يجب إعادة السلسلة كاملة.", correct: false }, { text: "يكمل الجدول الزمني عاديًا دون إعادة البدء.", correct: true }, { text: "يحتاج لجرعة إضافية.", correct: false }, ], category: "VAR-VC الإجراء" },
+                { title: "السيناريو 13: حيوان أليف مُلقح", description: "تعرض شخص لخدش نازف من كلبه الخاص الذي تلقى جميع تطعيماته السنوية بانتظام.", options: [ { text: "يتلقى العلاج الكامل (لقاح + مصل).", correct: false }, { text: "يتم غسل الجرح وتطهيره.", correct: true }, { text: "يتم التحقق من سجل تطعيم الكلب.", correct: true }, { text: "لا يحتاج علاج طالما الكلب مُلقح (مع الغسل).", correct: true }, ], category: "فئة II (حيوان مُلقح)" },
+                { title: "السيناريو 14: طريقة إعطاء المصل", description: "مريض يحتاج لـ IGAR. لديه جرح سطحي صغير وكمية كبيرة من المصل. ما هو الإجراء الأمثل؟", options: [ { text: "حقن كل الكمية في العضل في المؤخرة.", correct: false }, { text: "حقن معظم الكمية حول الجرح والباقي في العضل.", correct: true }, { text: "التخلص من الكمية الزائدة إذا لم يتسع الجرح.", correct: false }, ], category: "IGAR" },
+                { title: "السيناريو 15: المرأة الحامل", description: "امرأة حامل تعرضت لعضة فئة III (خطيرة).", options: [ { text: "يتم إعطاء اللقاح فقط دون المصل.", correct: false }, { text: "يتم تأجيل العلاج حتى الولادة.", correct: false }, { text: "يجب إعطاء العلاج الكامل (لقاح + IGAR) فوراً.", correct: true }, ], category: "حالات خاصة" },
+                { title: "السيناريو 16: الوقاية قبل التعرض (PPrEx)", description: "طبيب بيطري تلقى تطعيماً وقائياً كاملاً (PPrEx). تعرض لخدش عميق ونازف.", options: [ { text: "يحتاج لبروتوكول كامل (IGAR + 4 جرعات).", correct: false }, { text: "يحتاج لجرعتي عودة فقط (J0, J3) ولا يحتاج IGAR.", correct: true }, { text: "يحتاج لجرعتي عودة مع IGAR.", correct: false }, ], category: "PPrEx" },
+                { title: "السيناريو 17: خلط اللقاحات", description: "مريض بدأ اللقاح العصبي (VAR-TN)، ونفد المخزون. هل يمكنه التحول إلى الخلوي (VAR-VC) لإكمال السلسلة؟", options: [ { text: "نعم، يمكن الخلط طالما كلاهما ضد السعار.", correct: false }, { text: "لا، يجب عدم خلط النوعين في نفس السلسلة.", correct: true }, { text: "يجب إعادة السلسلة باستخدام الخلوي.", correct: false }, ], category: "VAR-VC/VAR-TN" },
+                { title: "السيناريو 18: عضة قرد (حيوان بري)", description: "تعرض شخص لعضة عميقة من قرد (يعتبر حيوان بري/غير أليف).", options: [ { text: "فئة I، غسل فقط.", correct: false }, { text: "يعتبر فئة III، ويتلقى IGAR + لقاح.", correct: true }, { text: "يتلقى اللقاح فقط.", correct: false }, ], category: "الفئة III" },
+                { title: "السيناريو 19: إيقاف العلاج", description: "مريض بدأ العلاج الوقائي. متى يمكن إيقاف العلاج بأمان؟", options: [ { text: "بعد أخذ الجرعة الثانية.", correct: false }, { text: "إذا ثبت أن الحيوان المهاجم سليم بعد 10 أيام من المراقبة.", correct: true }, { text: "بعد 15 يوماً من العضة بغض النظر عن حالة الحيوان.", correct: false }, ], category: "المراقبة" },
+                { title: "السيناريو 20: الوقاية العامة", description: "ما هو خط الدفاع الأول والأكثر فعالية على المستوى المجتمعي ضد داء الكلب؟", options: [ { text: "تطبيق العلاج الكامل لجميع المصابين.", correct: false }, { text: "التطعيم المنتظم للكلاب والقطط الأليفة.", correct: true }, { text: "بناء مراكز عزل كبيرة.", correct: false }, ], category: "الوقاية" },
+
+                // سيناريوهات التلقيح المتقدمة (21-30)
+                { title: "السيناريو 21: بروتوكول زغرب (الأيام)", description: "لشخص غير ملقح يتعرض لعضة فئة II، ما هي أيام الجرعات في بروتوكول زغرب (VAR-VC)؟", options: [ { text: "J0, J7, J14, J28", correct: false }, { text: "J0 (جرعتان), J7, J21", correct: true }, { text: "J0, J3, J7, J14", correct: false }, ], category: "بروتوكول زغرب" },
+                { title: "السيناريو 22: بروتوكول إيسن (الأيام)", description: "لشخص غير ملقح يتعرض لعضة فئة II، ما هي أيام الجرعات في بروتوكول إيسن (VAR-VC)؟", options: [ { text: "J0, J7, J21", correct: false }, { text: "J0, J3, J7, J14", correct: true }, { text: "J0 (جرعتان), J7, J14", correct: false }, ], category: "بروتوكول إيسن" },
+                { title: "السيناريو 23: حقن اللقاح في الأرداف", description: "تم حقن اللقاح الخلوي (VAR-VC) في الأرداف لمريض بالغ. ما هو الخطر؟", options: [ { text: "يزيد من الألم.", correct: false }, { text: "لا يوجد خطر.", correct: false }, { text: "يقلل من فعالية اللقاح بشكل كبير.", correct: true }, ], category: "طريقة الحقن" },
+                { title: "السيناريو 24: الإعطاء داخل الأدمة (ID)", description: "يتم استخدام الحقن داخل الأدمة (ID) بجرعات 0.1 مل للقاح الخلوي كإجراء توفيري. ما هو الإجراء الصحيح في هذه الحالة لشخص غير ملقح؟", options: [ { text: "جرعة واحدة في موقع واحد لـ J0, J3, J7.", correct: false }, { text: "جرعتان في موقعين مختلفين لـ J0, J3, J7.", correct: true }, { text: "4 جرعات في موقع واحد لـ J0 فقط.", correct: false }, ], category: "الجرعة التوفيرية" },
+                { title: "السيناريو 25: IGAR والملقح سابقاً", description: "شخص ملقح سابقاً ضد السعار يتعرض لعضة فئة III. هل يحتاج IGAR؟", options: [ { text: "نعم، يحتاجه دائماً في الفئة III.", correct: false }, { text: "لا، لا يحتاج IGAR.", correct: true }, { text: "يحتاجه إذا كانت العضة في الرأس.", correct: false }, ], category: "PPrEx" },
+                { title: "السيناريو 26: بروتوكول اللقاح العصبي", description: "شخص غير ملقح يتعرض لعضة فئة III، ويتلقى اللقاح العصبي (VAR-TN). ما هو عدد الجرعات الإجمالي؟", options: [ { text: "4 جرعات", correct: false }, { text: "6 جرعات", correct: true }, { text: "جرعتان فقط", correct: false }, ], category: "VAR-TN" },
+                { title: "السيناريو 27: حالة تأخر متقدمة", description: "مريض تعرض لعضة قبل 6 أشهر ولم يتلق أي علاج. هل يجب البدء بالعلاج الوقائي الآن؟", options: [ { text: "لا، لا فائدة بعد 3 أشهر.", correct: false }, { text: "نعم، يجب البدء فوراً.", correct: true }, { text: "نعم، لكن IGAR فقط.", correct: false }, ], category: "التأخير" },
+                { title: "السيناريو 28: التلقيح المتكرر", description: "شخص يتلقى اللقاح الخلوي. هل يجب إعادة فحص الأجسام المضادة (Titration) بعد كل سلسلة علاج؟", options: [ { text: "نعم، دائماً.", correct: false }, { text: "لا، إلا إذا كان المريض ناقص مناعة.", correct: true }, { text: "لا، أبداً.", correct: false }, ], category: "المراقبة" },
+                { title: "السيناريو 29: اللقاح العصبي في الأدمة", description: "يجب إعطاء اللقاح العصبي (VAR-TN):", options: [ { text: "عضلي فقط.", correct: true }, { text: "داخل الأدمة (ID).", correct: false }, { text: "تحت الجلد (SC).", correct: false }, ], category: "VAR-TN" },
+                { title: "السيناريو 30: الإجراء الإداري عند المراقبة", description: "إذا تقرر مراقبة كلب لمدة 15 يوماً بعد العضة، متى يتم إيقاف اللقاح الذي بدأناه؟", options: [ { text: "فور بدء المراقبة.", correct: false }, { text: "بعد مرور 5 أيام من المراقبة.", correct: false }, { text: "إذا ظل الحيوان سليماً حياً حتى اليوم الخامس عشر.", correct: true }, ], category: "المراقبة" },
+            ],
+            // البيانات الفرنسية محذوفة للتخفيف
         };
 
-        document.addEventListener('DOMContentLoaded', function () {
-            const mainContent = document.getElementById('main-content');
-            const sidebar = document.getElementById('sidebar');
-            const hamburgerMenu = document.getElementById('hamburger-menu');
-            const backButton = document.getElementById('back-button'); 
-            const lockScreen = document.getElementById('lock-screen');
-            const passwordInput = document.getElementById('password-input');
-            const passwordSubmit = document.getElementById('password-submit');
-            const errorMessage = document.getElementById('error-message');
-            
-            const IS_AUTHENTICATED_SESSION = sessionStorage.getItem('appUnlocked') === 'true';
+        // =========================================================
+        // 2. الدوال المساعدة
+        // =========================================================
 
-            let currentLang = 'ar'; 
+        const copyrightAr = `
+            <div style="padding: 15px; font-size: 0.8em; color: #666; margin-top: 30px; border-top: 1px solid #eee;">
+                <p style="margin: 5px 0;">حقوق النشر © 2024. جميع الحقوق محفوظة.</p>
+                <p style="margin: 5px 0;">المطور: حميدوش عبد التواب، المؤسسة العمومية للصحة الجوارية برج منايل.</p>
+            </div>
+        `;
 
-            function setBackButtonSymbol(lang) {
-                backButton.innerHTML = '&larr;';
-            }
-            
-            function generateSimulatorHTML(lang) {
-                const data = contentData[lang] || contentData['ar'];
-                return `<h3>${data.simulator_title}</h3><p>${data.simulator_p1}</p><div class="simulator"><div><label for="exposure-type">${data.simulator_exposure_label}</label><select id="exposure-type"><option value="1">${data.exp_op1}</option><option value="2">${data.exp_op2}</option><option value="3.1">${data.exp_op3}</option><option value="3.2">${data.exp_op4}</option></select></div><div><label for="animal-type">${data.simulator_animal_label}</label><select id="animal-type"><option value="high_risk">${data.animal_op1}</option><option value="no_risk">${data.animal_op2}</option><option value="wild_risk">${data.animal_op3}</option></select></div><div><label for="vaccine-status">${data.simulator_vaccine_label}</label><select id="vaccine-status"><option value="no">${data.vac_op1}</option><option value="yes">${data.vac_op2}</option></select></div></div><div id="simulator-result" class="hide"></div>`;
-            }
+        function setBackButtonSymbol(lang) {
+             const symbol = (lang === 'ar') ? '&#8594;' : '&larr;'; 
+             document.getElementById('back-button').innerHTML = symbol;
+        }
 
-            function generateComparisonHTML(lang) {
-                 const data = contentData[lang] || contentData['ar'];
-                 return `<h3>${data.comparison_title}</h3><table><thead><tr><th>${data.comp_feature}</th><th>${data.comp_cellular}</th><th>${data.comp_tissue}</th></tr></thead><tbody><tr><td>${data.comp_f1}</td><td>${data.comp_c1}</td><td>${data.comp_t1}</td></tr><tr><td>${data.comp_f2}</td><td>${data.comp_c2}</td><td>${data.comp_t2}</td></tr><tr><td>${data.comp_f3}</td><td>${data.comp_c3}</td><td>${data.comp_t3}</td></tr></tbody></table>`;
-            }
+        // --- واجهة شاشة البدء (Start Screen) ---
+        function generateStartScreen(lang) {
+            const data = contentData[lang];
+            const scenariosCount = scenariosMaster[lang].length;
+            return `
+                <div id="start-screen" class="card" style="text-align: center; max-width: 500px;">
+                    <h1>${lang === 'ar' ? 'محاكي بروتوكول داء الكلب' : 'Simulateur Protocole Antirabique'}</h1>
+                    <p style="font-size: 1.1em; color: var(--header-color); margin-bottom: 30px;">
+                        ${lang === 'ar' ? 'اختبر معلوماتك في الإجراءات الفورية والوقائية للتعامل مع حالات التعرض للسعار.' : 'Testez vos connaissances sur les mesures immédiates et la prophylaxie de la rage.'}
+                    </p>
+                    <p style="font-weight: 700; color: var(--accent-color);">
+                        ${lang === 'ar' ? `المحاكي يحتوي على ${scenariosCount} سيناريوهات عشوائية.` : `Le simulateur contient ${scenariosCount} scénarios aléatoires.`}
+                    </p>
+                    <button id="start-button">${lang === 'ar' ? 'بدء اللعبة' : 'Démarrer le Jeu'}</button>
+                </div>
+            `;
+        }
+        
+        // --- واجهة السيناريو (Scenario Screen) ---
+        function generateScenarioHTML(lang, scenarioIndex) {
+            const scenario = shuffledScenarios[scenarioIndex]; 
+            const isSubmitted = userAnswers[scenarioIndex] !== undefined;
+            const totalScenarios = scenariosMaster[lang].length;
 
-            function renderApp(lang) {
-                const data = contentData[lang] || contentData['ar'];
-                const footer = lang === 'ar' ? copyrightAr : copyrightFr;
-
-                const navLinksHtml = Object.keys(data).filter(key => key.startsWith('nav_')).map(key => {
-                    const id = key.substring(4);
-                    return `<li><a href="#${id}"><span>${data[key].split(' ')[0]}</span> ${data[key].substring(data[key].indexOf(' ') + 1)}</a></li>`;
-                }).join('');
-
-                sidebar.innerHTML = `<button id="lang-toggle">${data.lang_toggle_text}</button><h2>${data.sidebar_title}</h2><input type="search" id="search-box" placeholder="${data.search_placeholder}"><ul id="nav-links">${navLinksHtml}</ul>`;
+            let optionsHtml = scenario.options.map((option, index) => {
+                let classes = 'action-option';
+                let icon = '';
                 
-                mainContent.innerHTML = 
-                    `<section id="simulator" class="content-section"><div class="card">${generateSimulatorHTML(lang)}</div></section>
-                    <section id="intro" class="content-section">${data.intro_html}</section>
-                    <section id="golden-rules" class="content-section">${data.rules_html}</section>
-                    <section id="risk-assessment" class="content-section">${data.risk_html}</section>
-                    <section id="comparison" class="content-section"><div class="card">${generateComparisonHTML(lang)}</div></section>
-                    <section id="igar" class="content-section">${data.igar_html}</section>
-                    <section id="cellular-vaccine" class="content-section">${data.cellular_vaccine_html}</section>
-                    <section id="tissue-vaccine" class="content-section">${data.tissue_vaccine_html}</section>
-                    <section id="special-cases" class="content-section">${data.special_cases_html}</section>
-                    <section id="prevention" class="content-section">${data.prevention_html}</section>
-                    
-                    ${footer}`; 
-                
-                document.documentElement.lang = lang;
-                document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
-                setBackButtonSymbol(lang);
-                attachEventListeners();
-                updateActiveLink();
-            }
-
-            function attachEventListeners() {
-                hamburgerMenu.addEventListener('click', () => sidebar.classList.toggle('open'));
-                mainContent.addEventListener('click', () => sidebar.classList.remove('open'));
-                
-                // 1. ربط زر الرجوع بوظيفة history.back()
-                document.getElementById('back-button').addEventListener('click', () => {
-                    window.history.back();
-                });
-                
-                // 2. معالجة زر تبديل اللغة (يلغي التنقل)
-                document.getElementById('lang-toggle').addEventListener('click', () => { 
-                    currentLang = currentLang === 'ar' ? 'fr' : 'ar'; 
-                    
-                    history.replaceState(null, '', window.location.hash || '#simulator');
-                    
-                    renderApp(currentLang); 
-                });
-
-                document.querySelectorAll('.simulator select').forEach(select => select.addEventListener('change', runSimulator));
-                document.getElementById('search-box').addEventListener('input', (e) => { 
-                    const searchTerm = e.target.value.toLowerCase().trim(); 
-                    document.querySelectorAll('.main-content .content-section').forEach(section => { 
-                        section.style.display = section.textContent.toLowerCase().includes(searchTerm) ? 'block' : 'none'; 
-                    }); 
-                });
-                window.addEventListener('scroll', updateActiveLink);
-                document.querySelectorAll('.accordion-header').forEach(header => { header.addEventListener('click', function() { this.classList.toggle('active'); const content = this.nextElementSibling; if (content.style.maxHeight) { content.style.maxHeight = null; } else { content.style.maxHeight = content.scrollHeight + 'px'; } }); });
-                
-                // 3. معالجة روابط الشريط الجانبي (تنشئ نقطة تنقل)
-                document.querySelectorAll('.sidebar ul li a').forEach(link => { 
-                    link.addEventListener('click', (e) => { 
-                        e.preventDefault(); 
-                        const targetId = link.getAttribute('href');
-                        
-                        history.pushState(null, '', targetId);
-                        
-                        document.querySelector(targetId).scrollIntoView({ behavior: 'smooth' });
-
-                        if (window.innerWidth <= 992) { 
-                            sidebar.classList.remove('open'); 
-                        } 
-                        updateActiveLink();
-                    }); 
-                });
-
-                // 4. معالجة زر الرجوع/الأمام في المتصفح نفسه
-                window.addEventListener('popstate', () => {
-                    const hash = window.location.hash || '#simulator';
-                    const targetElement = document.querySelector(hash);
-                    if (targetElement) {
-                        targetElement.scrollIntoView({ behavior: 'smooth' });
+                if (isSubmitted) {
+                    const isSelected = userAnswers[scenarioIndex].selected.includes(index);
+                    if (isSelected) {
+                        classes += option.correct ? ' correct' : ' incorrect';
+                        icon = option.correct ? '✔' : '❌';
+                    } else if (option.correct) {
+                        classes += ' correct';
+                        icon = '✔';
                     }
-                    updateActiveLink();
-                });
-            }
-
-            function updateActiveLink() {
-                let currentSectionId = "";
-                document.querySelectorAll('.content-section').forEach(section => { 
-                    if (window.scrollY >= section.offsetTop - 100) { 
-                        currentSectionId = section.id; 
-                    } 
-                });
-                
-                document.querySelectorAll('.sidebar ul li a').forEach(link => { 
-                    if (link.getAttribute('href') === `#${currentSectionId}`) { 
-                        link.classList.add('active'); 
-                    } else {
-                        link.classList.remove('active');
-                    }
-                });
-            }
-
-            function runSimulator() {
-                const exposure = document.getElementById('exposure-type').value;
-                const animal = document.getElementById('animal-type').value;
-                const vaccinated = document.getElementById('vaccine-status').value;
-                const resultDiv = document.getElementById('simulator-result');
-                const data = contentData[currentLang] || contentData['ar'];
-                let category = 0, action = "", justification = "";
-
-                if (animal === 'no_risk') {
-                    category = 0; action = currentLang === 'ar' ? "لا داعي لأي علاج وقائي." : "Aucune prophylaxie requise.";
-                    justification = currentLang === 'ar' ? "القوارض الصغيرة لا تتطلب علاجًا ضد داء الكلب." : "Les petits rongeurs ne nécessitent pas de traitement contre la rage.";
-                } else {
-                    if (exposure === '1') category = 1; else if (exposure === '2') category = 2; else category = 3;
-                    if (animal === 'wild_risk') category = 3;
-                    if (category === 1) {
-                         action = currentLang === 'ar' ? "غسل المنطقة فقط." : "Lavage de la zone uniquement.";
-                         justification = currentLang === 'ar' ? "التعرض من الفئة الأولى لا يتطلب علاجًا." : "L'exposition de catégorie I ne nécessite pas de prophylaxie.";
-                    } else if (vaccinated === 'yes') {
-                        action = currentLang === 'ar' ? "تنظيف الجرح + <strong>بروتوكول العودة (جرعتان لقاح خلوي في يوم 0 و 3)</strong>." : "Nettoyage de la plaie + <strong>Protocole de rappel (2 doses de vaccin cellulaire à J0 et J3)</strong>.";
-                        justification = currentLang === 'ar' ? "الشخص الملقح سابقًا يحتاج فقط لتنشيط ذاكرته المناعية ولا يحتاج للمصل (IGAR)." : "Une personne déjà vaccinée n'a besoin que de réactiver sa mémoire immunitaire et n'a pas besoin d'IGAR.";
-                    } else {
-                         if (category === 2) {
-                            action = currentLang === 'ar' ? "تنظيف الجرح + <strong>لقاح فوري (بروتوكول زغرب/إيسن)</strong>." : "Nettoyage de la plaie + <strong>Vaccination immédiate (Protocole Zagreb/Essen)</strong>.";
-                            justification = currentLang === 'ar' ? "التعرض من الفئة الثانية يتطلب لقاحًا فقط." : "L'exposition de catégorie II ne nécessite que le vaccin.";
-                         } else if (category === 3) {
-                            action = currentLang === 'ar' ? "تنظيف الجرح + <strong>لقاح فوري</strong> + <strong>حقن IGAR حول الجرح</strong>." : "Nettoyage de la plaie + <strong>Vaccination immédiate</strong> + <strong>Injection d'IGAR autour de la plaie</strong>.";
-                            justification = currentLang === 'ar' ? "التعرض من الفئة الثالثة يتطلب الحماية الكاملة والفورية باللقاح والأجسام المضادة." : "L'exposition de catégorie III nécessite une protection complète et immédiate.";
-                         }
-                    }
+                } else if (userAnswers.length > scenarioIndex) {
+                     const isSelected = userAnswers[scenarioIndex].selected.includes(index);
+                     if (isSelected) classes += ' selected';
                 }
-
-                resultDiv.classList.remove('hide');
-                resultDiv.innerHTML = `<h4>${data.result_title}</h4><p><strong>${data.result_cat}</strong> ${category > 0 ? category : (currentLang === 'ar' ? 'لا ينطبق' : 'N/A')}</p><p><strong>${data.result_action}</strong> ${action}</p><p><strong>${data.result_just}</strong> ${justification}</p>`;
-            }
-            
-            // =========================================================
-            // منطق شاشة القفل (يتم تنفيذه أولاً)
-            // =========================================================
-            
-            const appContainer = document.querySelector('.container');
-
-            function unlockApp() {
-                lockScreen.style.display = 'none';
-                sessionStorage.setItem('appUnlocked', 'true');
                 
-                // إظهار المحتوى الرئيسي بعد المصادقة
-                appContainer.style.display = 'flex';
+                return `<div class="${classes}" data-index="${index}" ${isSubmitted ? 'style="pointer-events: none;"' : ''}>${option.text} <span style="float: left; color: inherit;">${icon}</span></div>`;
+            }).join('');
+            
+            const feedbackScreen = isSubmitted ? generateFeedback(lang, scenarioIndex) : '';
+
+            return `
+                <div class="card">
+                    <h3 style="color: var(--accent-color);">${lang === 'ar' ? 'السيناريو' : 'Scénario'} ${scenarioIndex + 1} / ${totalScenarios}</h3>
+                    <p style="font-size: 1.1em; font-weight: 600; color: var(--header-color);">${scenario.title}</p>
+                    <p>${scenario.description}</p>
+                    
+                    <h4 style="margin-top: 30px;">${lang === 'ar' ? 'اختر جميع الإجراءات الصحيحة (قد يكون هناك أكثر من خيار):' : 'Sélectionnez toutes les actions correctes (plusieurs choix possibles):'}</h4>
+                    
+                    <div id="action-options" class="scenario-actions">
+                        ${optionsHtml}
+                    </div>
+
+                    ${feedbackScreen}
+
+                    <div id="scenario-controls" style="text-align: center;">
+                        ${!isSubmitted ? 
+                            `
+                            <button id="submit-scenario">${lang === 'ar' ? 'تقييم الإجراءات' : 'Évaluer les Actions'}</button>
+                            <button id="skip-scenario">${lang === 'ar' ? 'تجاوز السيناريو' : 'Passer le Scénario'}</button>
+                            ` :
+                            `<button id="next-scenario">${scenarioIndex < totalScenarios - 1 ? (lang === 'ar' ? 'السيناريو التالي' : 'Scénario Suivant') : (lang === 'ar' ? 'عرض النتائج النهائية' : 'Afficher les Résultats')}</button>`
+                        }
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- دالة تقييم السيناريو ---
+        function submitScenario(lang) {
+            const scenario = shuffledScenarios[currentScenarioIndex];
+            const selectedOptions = Array.from(document.querySelectorAll('.action-option.selected'));
+            const selectedIndices = selectedOptions.map(opt => parseInt(opt.getAttribute('data-index')));
+            
+            let correctCount = 0;
+            
+            scenario.options.forEach((option, index) => {
+                const isSelected = selectedIndices.includes(index);
                 
-                renderApp(currentLang);
-            }
-            
-            function checkPassword() {
-                const enteredPassword = passwordInput.value.trim().toUpperCase(); 
-                if (enteredPassword === MASTER_PASSWORD) {
-                    unlockApp();
-                } else {
-                    errorMessage.style.display = 'block';
-                    passwordInput.value = ''; 
-                }
-            }
-            
-            passwordSubmit.addEventListener('click', checkPassword);
-            passwordInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') {
-                    checkPassword();
+                if (option.correct && isSelected) {
+                    correctCount++;
+                } else if (!option.correct && isSelected) {
+                    correctCount--;
+                } else if (option.correct && !isSelected) {
+                    correctCount--;
                 }
             });
 
-            if (IS_AUTHENTICATED_SESSION) {
-                unlockApp();
+            const totalPossibleCorrect = scenario.options.filter(o => o.correct).length;
+            const scenarioScore = Math.max(0, correctCount);
+            
+            userAnswers[currentScenarioIndex] = {
+                score: scenarioScore,
+                selected: selectedIndices,
+                maxScore: totalPossibleCorrect,
+                skipped: false
+            };
+            
+            history.replaceState(null, '', window.location.hash);
+            renderApp(lang);
+        }
+        
+        // --- دالة تجاوز السيناريو ---
+        function skipScenario() {
+            const scenario = shuffledScenarios[currentScenarioIndex];
+            const totalPossibleCorrect = scenario.options.filter(o => o.correct).length;
+            
+            // تسجيل السيناريو كنقطة صفرية ومُتَجاوَز
+            userAnswers[currentScenarioIndex] = {
+                score: 0,
+                selected: [],
+                maxScore: totalPossibleCorrect,
+                skipped: true
+            };
+            
+            // الانتقال للسيناريو التالي
+            currentScenarioIndex++;
+            
+            if (currentScenarioIndex < shuffledScenarios.length) {
+                history.pushState(null, '', `#scenario_${currentScenarioIndex}`);
             } else {
-                lockScreen.style.display = 'flex';
+                history.pushState(null, '', `#results`);
+            }
+            renderApp(currentLang);
+        }
+
+
+        // --- واجهة التغذية الراجعة (Feedback) ---
+        function generateFeedback(lang, scenarioIndex) {
+            const scenario = shuffledScenarios[scenarioIndex];
+            const result = userAnswers[scenarioIndex];
+            
+            // إذا تم تجاوز السيناريو
+            if (result.skipped) {
+                return `<div style="margin-top: 20px; padding: 15px; border: 1px solid var(--accent-color); border-radius: 8px; text-align: center;">
+                            <p style="color: var(--accent-color); font-weight: 700;">${lang === 'ar' ? 'تم تجاوز هذا السيناريو.' : 'Scénario ignoré.'}</p>
+                        </div>`;
+            }
+
+            let feedbackHtml = `<h4 style="color: var(--success-color); margin-top: 30px;">${lang === 'ar' ? 'تقييم السيناريو:' : 'Évaluation du Scénario:'}</h4>`;
+
+            scenario.options.forEach((option, index) => {
+                const isSelected = result.selected.includes(index);
+                const isCorrect = option.correct;
+                
+                let statusClass = '';
+                let statusIcon = '';
+                let statusText = '';
+                
+                if (isSelected && isCorrect) {
+                    statusClass = 'correct';
+                    statusIcon = '✔';
+                    statusText = 'إجراء صحيح تم اختياره';
+                } else if (isSelected && !isCorrect) {
+                    statusClass = 'incorrect';
+                    statusIcon = '❌';
+                    statusText = 'إجراء خاطئ تم اختياره (تم خصم نقاط)';
+                } else if (!isSelected && isCorrect) {
+                    statusClass = 'incorrect';
+                    statusIcon = '❌';
+                    statusText = 'إجراء صحيح تم إغفاله (تم خصم نقاط)';
+                }
+                
+                if (statusClass) {
+                     feedbackHtml += `
+                         <div class="feedback-item ${statusClass}">
+                            <span>${statusIcon}</span>
+                            <strong>${option.text}</strong>
+                            <span style="font-size: 0.9em; margin-right: auto; color: inherit;">(${statusText})</span>
+                         </div>
+                     `;
+                }
+            });
+            
+            const scoreMsg = lang === 'ar' ? 
+                `النتيجة في هذا السيناريو: ${result.score} نقطة.` : 
+                `Score pour ce scénario: ${result.score} points.`;
+                
+            return `
+                <div style="margin-top: 20px; border-top: 1px dashed #ccc; padding-top: 20px;">
+                    <p style="font-weight: 700; color: var(--header-color); text-align: center;">${scoreMsg}</p>
+                    ${feedbackHtml}
+                </div>
+            `;
+        }
+
+        // --- واجهة النتائج النهائية (Final Results) ---
+        function generateFinalResultHTML(lang) {
+            const maxScore = scenariosMaster[lang].reduce((sum, s) => sum + s.options.filter(o => o.correct).length, 0); 
+            
+            // حساب النتيجة التراكمية فقط للسيناريوهات غير المتجاوزة
+            const finalScore = userAnswers.reduce((sum, result) => sum + result.score, 0);
+
+            const percentage = (finalScore / maxScore) * 100;
+
+            let advice, ratingColor;
+
+            if (lang === 'ar') {
+                if (percentage >= 90) { advice = '🏆 ممتاز! سيطرة كاملة على إدارة حالات داء الكلب.'; ratingColor = 'var(--primary-color)'; }
+                else if (percentage >= 80) { advice = '🌟 جيد جداً! أداء قوي، راجع السيناريوهات التي فقدت فيها نقاطًا.'; ratingColor = 'var(--success-color)'; }
+                else if (percentage >= 60) { advice = '💡 مقبول. تحتاج لمراجعة الإجراءات الإلزامية (IGAR والخياطة).'; ratingColor = 'var(--accent-color)'; }
+                else { advice = '❌ ضعيف. بحاجة لمراجعة مكثفة للمرجع قبل إعادة المحاولة.'; ratingColor = 'var(--danger-color)'; }
+            } else {
+                 if (percentage >= 90) { advice = '🏆 Excellent professionnel!'; ratingColor = 'var(--primary-color)'; }
+                 else if (percentage >= 80) { advice = '🌟 Performance remarquable!'; ratingColor = 'var(--success-color)'; }
+                 else if (percentage >= 60) { advice = '💡 Acceptable. Nécessite une révision des procédures clés.'; ratingColor = 'var(--accent-color)'; }
+                 else { advice = '❌ Faible. Révision intensive nécessaire.'; ratingColor = 'var(--danger-color)'; }
             }
             
+            const resultText = lang === 'ar' ? 
+                `حصلت على ${finalScore} نقطة من أصل ${maxScore} نقطة ممكنة (${percentage.toFixed(1)}%).` : 
+                `Vous avez obtenu ${finalScore} points sur ${maxScore} possibles (${percentage.toFixed(1)}%).`;
+            
+            return `
+                <div class="card" style="text-align: center;">
+                    <h3>${lang === 'ar' ? 'النتائج النهائية وتقييم الأداء' : 'Résultats Finaux et Évaluation'}</h3>
+                    <p style="font-size: 1.5em; font-weight: 800; color: ${ratingColor};">${resultText}</p>
+                    <p style="font-size: 1.2em; color: ${ratingColor};">${advice}</p>
+                    <button onclick="history.pushState(null, '', '#start'); renderApp('${lang}');" id="restart-button" style="background-color: var(--success-color) !important; color: white;">${lang === 'ar' ? 'إعادة المحاكمة' : 'Recommencer'}</button>
+                </div>
+            `;
+        }
+
+        // =========================================================
+        // 3. منطق التحكم والتنقل (Logic)
+        // =========================================================
+
+        const contentData = {
+            ar: {
+                sidebar_title: "قائمة التنقل", lang_toggle_text: "Français", 
+                nav_start: "🏠 الصفحة الرئيسية", nav_scenarios: "🧠 بدء المحاكي", nav_about: "ℹ️ معلومات عن التطبيق",
+            },
+             fr: {
+                sidebar_title: "Menu de Navigation", lang_toggle_text: "العربية", 
+                nav_start: "🏠 Accueil", nav_scenarios: "🧠 Démarrer le Simulateur", nav_about: "ℹ️ À Propos",
+            },
+        };
+        
+        function renderApp(lang) {
+            const data = contentData[lang] || contentData['ar'];
+            const footer = copyrightAr;
+            const currentHash = window.location.hash || '#start';
+
+            const navLinksHtml = `
+                <li><a href="#start">${data.nav_start}</a></li>
+                <li><a href="#scenarios">${data.nav_scenarios}</a></li>
+                <li><a href="#about">${data.nav_about}</a></li>
+            `;
+
+            document.getElementById('sidebar').innerHTML = `
+                <button id="lang-toggle">${data.lang_toggle_text}</button>
+                <h2>${data.sidebar_title}</h2>
+                <ul id="nav-links">${navLinksHtml}</ul>
+            `;
+            
+            let contentHtml = '';
+
+            if (currentHash === '#start') {
+                contentHtml = generateStartScreen(lang);
+            } else if (currentHash === '#scenarios' || currentHash.startsWith('#scenario_')) {
+                const match = currentHash.match(/#scenario_(\d+)/);
+                currentScenarioIndex = match ? parseInt(match[1]) : 0;
+                
+                if (currentScenarioIndex < shuffledScenarios.length) {
+                    contentHtml = generateScenarioHTML(lang, currentScenarioIndex);
+                } else {
+                    history.replaceState(null, '', `#results`);
+                    contentHtml = generateFinalResultHTML(lang);
+                }
+            } else if (currentHash === '#results') {
+                contentHtml = generateFinalResultHTML(lang);
+            } else if (currentHash === '#about') {
+                 contentHtml = `<div class="card" style="text-align: center;">
+                                    <h3>${lang === 'ar' ? 'معلومات عن التطبيق' : 'About the App'}</h3>
+                                    <p>${lang === 'ar' ? 'تم تطوير هذا المحاكي التعليمي بواسطة حميدوش عبد التواب، المختص في حفظ الصحة، لغرض التسهيل والتدريب العملي على بروتوكولات داء الكلب المعتمدة في مصلحة علم الأوبئة والطب الوقائي.' : 'This simulator was developed by Hamidouche Abdeetouab, Health Specialist, to facilitate practical training on rabies protocols.'}</p>
+                                    <p>${lang === 'ar' ? 'المؤسسة: المؤسسة العمومية للصحة الجوارية برج منايل.' : 'Institution: E.P.S.P. Bordj Menaiel.'}</p>
+                                </div>`;
+            }
+            
+            document.getElementById('main-content').innerHTML = `<div class="content-wrapper">${contentHtml}</div> ${footer}`; 
+            
+            document.documentElement.lang = lang;
+            document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+            setBackButtonSymbol(lang);
+            attachEventListeners(); 
+            updateActiveLink(); 
+        }
+
+        // =========================================================
+        // 4. ربط الأحداث (المصحح لضمان عمل الأزرار)
+        // =========================================================
+        
+        function attachEventListeners() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('main-content');
+            
+            // 1. ربط الأحداث الديناميكية (الأزرار داخل main-content)
+            
+            // زر بدء اللعبة
+            const startButton = document.getElementById('start-button');
+            if (startButton) {
+                 startButton.onclick = () => {
+                    shuffledScenarios = shuffleArray(scenariosMaster[currentLang]);
+                    currentScenarioIndex = 0;
+                    userAnswers = []; 
+                    
+                    history.pushState(null, '', `#scenario_0`);
+                    renderApp(currentLang);
+                 };
+            }
+
+            // زر تقييم الإجراءات
+            const submitButton = document.getElementById('submit-scenario');
+            if (submitButton) {
+                submitButton.onclick = () => submitScenario(currentLang);
+            }
+            
+            // [جديد] زر تجاوز السيناريو
+            const skipButton = document.getElementById('skip-scenario');
+            if (skipButton) {
+                 skipButton.onclick = skipScenario;
+            }
+
+            // زر السيناريو التالي
+            const nextButton = document.getElementById('next-scenario');
+            if (nextButton) {
+                nextButton.onclick = () => {
+                    currentScenarioIndex++;
+                    if (currentScenarioIndex < shuffledScenarios.length) {
+                        history.pushState(null, '', `#scenario_${currentScenarioIndex}`);
+                    } else {
+                        history.pushState(null, '', `#results`);
+                    }
+                    renderApp(currentLang);
+                };
+            }
+            
+            // معالجة اختيار الإجراءات
+            const actionsContainer = document.getElementById('action-options');
+            if (actionsContainer) {
+                actionsContainer.onclick = function(e) {
+                    if (e.target.classList.contains('action-option') && userAnswers[currentScenarioIndex] === undefined) {
+                        e.target.classList.toggle('selected');
+                    }
+                };
+            }
+
+            // إغلاق القائمة الجانبية عند النقر خارجها
+            mainContent.onclick = function(e) {
+                if (window.innerWidth <= 992 && sidebar.classList.contains('open') && !sidebar.contains(e.target) && e.target.id !== 'hamburger-menu') {
+                    sidebar.classList.remove('open');
+                }
+            };
+            
+            // 3. ربط الأحداث لروابط الشريط الجانبي (تجنب تكرار الربط)
+            document.querySelectorAll('.sidebar ul li a').forEach(link => { 
+                 const clone = link.cloneNode(true);
+                 link.parentNode.replaceChild(clone, link);
+
+                 clone.addEventListener('click', (e) => { 
+                    e.preventDefault(); 
+                    const targetId = clone.getAttribute('href');
+                    
+                    if (targetId === '#scenarios') {
+                        shuffledScenarios = shuffleArray(scenariosMaster[currentLang]);
+                        currentScenarioIndex = 0;
+                        userAnswers = []; 
+                        history.pushState(null, '', `#scenario_0`);
+                    } else {
+                        history.pushState(null, '', targetId);
+                    }
+                    renderApp(currentLang); 
+                    if (window.innerWidth <= 992) { sidebar.classList.remove('open'); } 
+                 }); 
+            });
+        }
+
+        function updateActiveLink() {
+            const currentHash = window.location.hash;
+            let activeLink = '#start';
+            
+            if (currentHash === '#about') {
+                 activeLink = '#about';
+            } else if (currentHash.startsWith('#scenario') || currentHash === '#results' || currentHash === '#scenarios') {
+                 activeLink = '#scenarios';
+            } else if (currentHash === '#start' || currentHash === '') {
+                 activeLink = '#start';
+            }
+
+            document.querySelectorAll('.sidebar ul li a').forEach(link => { 
+                link.classList.remove('active');
+                if (link.getAttribute('href') === activeLink) { 
+                    link.classList.add('active'); 
+                } 
+            });
+        }
+        
+        // =========================================================
+        // 6. التحميل الأولي
+        // =========================================================
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // ربط أزرار التحكم الثابتة (مرة واحدة)
+            const sidebar = document.getElementById('sidebar');
+            const hamburgerMenu = document.getElementById('hamburger-menu');
+            const backButton = document.getElementById('back-button'); 
+
+            hamburgerMenu.onclick = () => sidebar.classList.toggle('open');
+            backButton.onclick = () => window.history.back();
+            
+            const langToggle = document.getElementById('lang-toggle');
+            if (langToggle) langToggle.onclick = () => { 
+                currentLang = currentLang === 'ar' ? 'fr' : 'ar'; 
+                history.replaceState(null, '', window.location.hash || '#start'); 
+                renderApp(currentLang); 
+            };
+
+            window.onpopstate = () => {
+                renderApp(currentLang);
+            };
+
+            // تهيئة السيناريوهات المخلطة عند أول تحميل
+            if (shuffledScenarios.length === 0) {
+                 shuffledScenarios = shuffleArray(scenariosMaster[currentLang]);
+            }
+            
+            if (!window.location.hash) {
+                history.replaceState(null, '', '#start');
+            }
+            renderApp(currentLang); 
         });
     </script>
 </body>
